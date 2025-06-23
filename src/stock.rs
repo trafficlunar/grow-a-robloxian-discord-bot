@@ -50,8 +50,14 @@ pub fn start_stock_loop(ctx: Context) {
 
             sleep_until(Instant::now() + wait_duration).await;
 
+            // Get current time to compute the seed for this iteration
+            let now_after = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards..?");
+            let after_secs = now_after.as_secs();
+
             // Generate stock
-            let seed: u64 = secs - (secs % UPDATE_INTERVAL);
+            let seed: u64 = after_secs - (after_secs % UPDATE_INTERVAL);
             let mut stock = HashMap::new();
 
             for (i, (name, chance)) in EGG_TYPES.iter().enumerate() {
