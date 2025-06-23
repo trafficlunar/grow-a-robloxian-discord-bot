@@ -5,10 +5,5 @@ edition = "2021"
 
 [dependencies]
 dotenvy = "0.15.7"
-libm = "0.2.15"
-mersenne_twister = "1.1.1"
-rand = "0.9.1"
-rand_mt = "5.0.0"
-rand_pcg = "0.9.0"
 serenity = "0.12.4"
 tokio = { version = "1.45.1", features = ["macros", "rt-multi-thread"] }

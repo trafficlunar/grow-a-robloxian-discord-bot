@@ -45,7 +45,7 @@ pub fn start_stock_loop(ctx: Context) {
                 .expect("Time went backwards..?");
 
             let secs = now.as_secs();
-            let next_interval = (secs / 10 + 1) * 10;
+            let next_interval = (secs / UPDATE_INTERVAL + 1) * UPDATE_INTERVAL;
             let wait_duration = Duration::from_secs(next_interval - secs);
 
             sleep_until(Instant::now() + wait_duration).await;
@@ -56,9 +56,10 @@ pub fn start_stock_loop(ctx: Context) {
 
             for (i, (name, chance)) in EGG_TYPES.iter().enumerate() {
                 let mut egg_rng = RobloxRng::new(seed + i as u64);
+
                 let roll = egg_rng.next_f64();
-                println!("{}, {}, {}", name, roll, seed + i as u64);
                 let quantity = egg_rng.next_range(1, 5);
+
                 let in_stock = if roll < *chance { quantity } else { 0 };
 
                 stock.insert(*name, in_stock);
