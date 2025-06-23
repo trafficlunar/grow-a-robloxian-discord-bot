@@ -1,7 +1,7 @@
 use std::env;
 
 use serenity::{
-    all::{Context, EventHandler, GatewayIntents, Ready},
+    all::{ActivityData, Context, EventHandler, GatewayIntents, Ready},
     async_trait, Client,
 };
 
@@ -15,6 +15,8 @@ struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _: Ready) {
         println!("Bot is online!");
+        ctx.set_activity(Some(ActivityData::watching("stock")));
+
         start_stock_loop(ctx);
     }
 }
