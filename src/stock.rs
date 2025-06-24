@@ -1,4 +1,5 @@
 use std::{
+    cmp::min,
     collections::HashMap,
     env,
     time::{Duration, SystemTime, UNIX_EPOCH},
@@ -19,6 +20,9 @@ const EGG_TYPES: [(&str, f64); 7] = [
     ("Mythical Egg", 0.0015),
     ("Celestial Egg", 0.0001),
 ];
+
+// Stock limits for specific eggs
+const STOCK_LIMITS: [(&str, u32); 2] = [("Mythical Egg", 2), ("Celestial Egg", 1)];
 
 const EMOJI_MAP: [(&str, &str); 7] = [
     ("Common Egg", "<:common_egg:1386442268700835960>"),
@@ -66,7 +70,18 @@ pub fn start_stock_loop(ctx: Context) {
                 let roll = egg_rng.next_f64();
                 let quantity = egg_rng.next_range(1, 5);
 
-                let in_stock = if roll < *chance { quantity } else { 0 };
+                let mut in_stock = if roll < *chance { quantity } else { 0 };
+
+                // Apply stock limits for specific eggs
+                if let Some(&limit) = STOCK_LIMITS
+                    .iter()
+                    .find(|(k, _)| *k == *name)
+                    .map(|(_, v)| v)
+                {
+                    if in_stock > 0 {
+                        in_stock = min(in_stock, limit);
+                    }
+                }
 
                 stock.insert(*name, in_stock);
             }
