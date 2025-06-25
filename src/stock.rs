@@ -5,7 +5,7 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use serenity::all::{ChannelId, Color, Context, CreateEmbed, CreateMessage};
+use poise::serenity_prelude::{ChannelId, Color, Context, CreateEmbed, CreateMessage};
 use tokio::time::{sleep_until, Instant};
 
 use crate::rng::RobloxRng;
