@@ -58,14 +58,14 @@ const EGG_TYPES: [EggType; 7] = [
     },
     EggType {
         name: "Mythical Egg",
-        spawn_chance: 0.0015,
+        spawn_chance: 0.006,
         stock_limit: Some(2),
         emoji: "<:mythical_egg:1386442306210627605>",
         role: Some("<@&1387432235560603688>"),
     },
     EggType {
         name: "Celestial Egg",
-        spawn_chance: 0.0001,
+        spawn_chance: 0.0003,
         stock_limit: Some(1),
         emoji: "<:celestial_egg:1386442297943527485>",
         role: Some("<@&1387432340808269954>"),
