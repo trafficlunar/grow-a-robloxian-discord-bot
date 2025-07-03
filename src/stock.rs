@@ -12,7 +12,7 @@ use crate::rng::RobloxRng;
 
 const UPDATE_INTERVAL: u64 = 300;
 
-struct EggType {
+struct ItemType {
     name: &'static str,
     spawn_chance: f64,
     stock_limit: Option<u32>,
@@ -20,55 +20,79 @@ struct EggType {
     role: Option<&'static str>,
 }
 
-const EGG_TYPES: [EggType; 7] = [
-    EggType {
+const EGGS: [ItemType; 7] = [
+    ItemType {
         name: "Common Egg",
         spawn_chance: 1.0,
         stock_limit: None,
         emoji: "<:common_egg:1386442268700835960>",
         role: None,
     },
-    EggType {
+    ItemType {
         name: "Uncommon Egg",
         spawn_chance: 0.75,
         stock_limit: None,
         emoji: "<:uncommon_egg:1386442310480302100>",
         role: None,
     },
-    EggType {
+    ItemType {
         name: "Rare Egg",
         spawn_chance: 0.35,
         stock_limit: None,
         emoji: "<:rare_egg:1386442308391538778>",
         role: Some("<@&1387430341987401849>"),
     },
-    EggType {
+    ItemType {
         name: "Epic Egg",
         spawn_chance: 0.15,
         stock_limit: None,
         emoji: "<:epic_egg:1386442299478900766>",
         role: Some("<@&1387430557385883840>"),
     },
-    EggType {
+    ItemType {
         name: "Legendary Egg",
         spawn_chance: 0.05,
         stock_limit: None,
         emoji: "<:legendary_egg:1386442303429808258>",
         role: Some("<@&1387432053166968993>"),
     },
-    EggType {
+    ItemType {
         name: "Mythical Egg",
         spawn_chance: 0.006,
         stock_limit: Some(2),
         emoji: "<:mythical_egg:1386442306210627605>",
         role: Some("<@&1387432235560603688>"),
     },
-    EggType {
+    ItemType {
         name: "Celestial Egg",
         spawn_chance: 0.0003,
         stock_limit: Some(1),
         emoji: "<:celestial_egg:1386442297943527485>",
         role: Some("<@&1387432340808269954>"),
+    },
+];
+
+const TOOLS: [ItemType; 3] = [
+    ItemType {
+        name: "Water Bot",
+        spawn_chance: 0.6,
+        stock_limit: None,
+        emoji: "<:water_bot:1390676187679821844>",
+        role: Some("<@&1390308127500406825>"),
+    },
+    ItemType {
+        name: "Priest Bot",
+        spawn_chance: 0.15,
+        stock_limit: None,
+        emoji: "<:priest_bot:1390676177504567436>",
+        role: Some("<@&1390308201106378885>"),
+    },
+    ItemType {
+        name: "Harvester Bot",
+        spawn_chance: 0.04,
+        stock_limit: None,
+        emoji: "<:harvester_bot:1390676182487404686>",
+        role: Some("<@&1390308245960265862>"),
     },
 ];
 
@@ -103,8 +127,12 @@ pub fn start_stock_loop(ctx: Context) {
             let seed: u64 = after_secs - (after_secs % UPDATE_INTERVAL);
             let mut stock = HashMap::new();
 
-            for (i, egg) in EGG_TYPES.iter().enumerate() {
+            let mut i: u8 = 0;
+
+            // Egg stock
+            for (_, egg) in EGGS.iter().enumerate() {
                 let mut rng = RobloxRng::new(seed + i as u64);
+                i += 1;
 
                 let roll = rng.next_f64();
                 if roll >= egg.spawn_chance {
@@ -121,32 +149,60 @@ pub fn start_stock_loop(ctx: Context) {
                 stock.insert(egg.name, quantity);
             }
 
+            // Tool stock
+            for (_, tool) in TOOLS.iter().enumerate() {
+                let mut rng = RobloxRng::new(seed + i as u64);
+                i += 1;
+
+                let roll = rng.next_f64();
+                if roll >= tool.spawn_chance {
+                    stock.insert(tool.name, 0);
+                    continue;
+                }
+
+                stock.insert(tool.name, 1);
+            }
+
             // Format stock in embed and ping roles
-            let mut stock_lines = String::new();
+            let mut egg_lines = String::new();
+            let mut tool_lines = String::new();
             let mut role_mentions = String::new();
 
-            for egg in &EGG_TYPES {
-                if let Some(&count) = stock.get(egg.name) {
-                    if count > 0 {
-                        stock_lines
-                            .push_str(&format!("{} {} - **{}**\n", egg.emoji, egg.name, count));
+            let mut process_items = |items: &[ItemType], output: &mut String| {
+                for item in items {
+                    if let Some(&count) = stock.get(item.name) {
+                        if count > 0 {
+                            output.push_str(&format!(
+                                "{} {} - **{}**\n",
+                                item.emoji, item.name, count
+                            ));
 
-                        // Add roles to ping in the message
-                        if let Some(role) = egg.role {
-                            if !role_mentions.is_empty() {
-                                role_mentions.push(' ');
+                            if let Some(role) = item.role {
+                                if !role_mentions.contains(role) {
+                                    if !role_mentions.is_empty() {
+                                        role_mentions.push(' ');
+                                    }
+                                    role_mentions.push_str(role);
+                                }
                             }
-                            role_mentions.push_str(role);
                         }
                     }
                 }
+            };
+
+            process_items(&EGGS, &mut egg_lines);
+            process_items(&TOOLS, &mut tool_lines);
+
+            if tool_lines.is_empty() {
+                tool_lines.push_str("Nothing");
             }
 
             // Create and send embed
             let embed = CreateEmbed::new()
-                .title("🥚 Egg Stock")
+                .title("Stock")
                 .color(Color::RED)
-                .description(stock_lines);
+                .field("Eggs", egg_lines, false)
+                .field("Tools", tool_lines, false);
 
             let mut builder = CreateMessage::new().embed(embed);
             if !role_mentions.is_empty() {
