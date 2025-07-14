@@ -20,7 +20,7 @@ struct ItemType {
     role: Option<&'static str>,
 }
 
-const EGGS: [ItemType; 7] = [
+const EGGS: [ItemType; 9] = [
     ItemType {
         name: "Common Egg",
         spawn_chance: 1.0,
@@ -58,17 +58,31 @@ const EGGS: [ItemType; 7] = [
     },
     ItemType {
         name: "Mythical Egg",
-        spawn_chance: 0.006,
+        spawn_chance: 0.012,
         stock_limit: Some(2),
         emoji: "<:mythical_egg:1386442306210627605>",
         role: Some("<@&1387432235560603688>"),
     },
     ItemType {
         name: "Celestial Egg",
-        spawn_chance: 0.0003,
+        spawn_chance: 0.006,
         stock_limit: Some(1),
         emoji: "<:celestial_egg:1386442297943527485>",
         role: Some("<@&1387432340808269954>"),
+    },
+    ItemType {
+        name: "Ethereal Egg",
+        spawn_chance: 0.003,
+        stock_limit: Some(1),
+        emoji: "<:ethereal_egg:1394343048858828800>",
+        role: Some("<@&1394343206577246278>"),
+    },
+    ItemType {
+        name: "Prismatic Egg",
+        spawn_chance: 0.0015,
+        stock_limit: Some(1),
+        emoji: "<:prismatic_egg:1394343067976204398>",
+        role: Some("<@&1394343256938123384>"),
     },
 ];
 
